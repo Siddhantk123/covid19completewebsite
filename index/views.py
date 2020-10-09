@@ -33,7 +33,7 @@ def index(request):
     from bs4 import BeautifulSoup
     import time
 
-
+    '''
     def notifyMe(title, message): #To Show The Notification
         notification.notify(
             title= title,
@@ -100,7 +100,7 @@ def index(request):
             time.sleep(5)
     #time.sleep(3600)    #Loop For 1 Hour (1 hour = 3600 seconds)         
             
-
+'''
 #    ML PART    
 
     def data_split(data, ratio):
@@ -132,11 +132,14 @@ def index(request):
         Pain=request.POST.get('Pain')
         age=request.POST.get('age')
         runnyNose=request.POST.get('runnyNose')
-        diffBreath=request.POST.get('runnyNose')
+        diffBreath=request.POST.get('diffBreath')
 
         #testing
-        inputFeatures= [int(fever),int(Pain),int(age),int(runnyNose),int(diffBreath)] #new data to analyse the machine
+        inputFeatures= [float(fever),int(Pain),int(age),int(runnyNose),int(diffBreath)] #new data to analyse the machine
         #print(inputFeatures)
+        # print(clf.predict_proba([inputFeatures]))
+        # print(clf.predict([inputFeatures]))
+        
         infProb= clf.predict_proba([inputFeatures])[0][1]
         e= math.ceil(infProb*100)
 
@@ -164,23 +167,37 @@ def about(request):
 
 
 def cases(request):
-    from bs4 import BeautifulSoup
-
-    def webData(url): #Getting The Data From The Website
+    def web1Data(url): #Getting The Data From The Website
         r = requests.get(url)
-        return r.text
+        return r.json() #returning it in a form of json, coz data is a json data, we can also return it in a form of text by
+                        #writing r.text(), depending on the requirement
+    html1_doc = web1Data('https://api.covid19india.org/raw_data16.json')
 
-    #if __name__ == "__main__":
-        
-    html_doc = webData('https://www.mohfw.gov.in/')
-    soup = BeautifulSoup(html_doc, 'html.parser') #Parsing The Data
-            
 
-    x= soup.find_all ('table')
-    exc={'table':str (x)}
-    #data=exc['table']
+
+
+
+    #----now work on data by analysing the data from website----
+    df=[]  #empty list
+    data=html1_doc['raw_data'] #html_doc ka  raw_data store hoga data me
+    for dic in data: #dic me each value aayega 
+        df.append([dic['currentstatus'],dic['dateannounced'], dic['numcases'],dic['detecteddistrict'],dic['detectedstate']]) #yaha 3-3 ke pair me list me append honge  #ko fetch kr rhe #3-3 ke pair me ye list me add hoge                                                                               #ko fetch kr rhe
+    #print(df)                                                                            
+    #ab list mil gya us data ka and store ho ya df me
+
+
+
+
+
+    #using the concept of data feame  of pandas
+    import pandas as pd
+    df=pd.DataFrame(df,columns=['CurrentStatus','Date Announced','Number of Cases','District','States'])#ye sirf heading dega frame dega
+    #df me table aayega
+    exc1={'table1':df.to_html()}
+    #print(exc1)
+
             
-    return render(request, 'cases.html',exc)
+    return render(request, 'cases.html', exc1)
 
 def contact(request):
     if request.method=='POST':
