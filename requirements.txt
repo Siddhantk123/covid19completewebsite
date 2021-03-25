@@ -98,7 +98,7 @@ PyTweening==1.0.3
 pytz==2018.9
 pywin32==227
 pywinpty==0.5.7
-PyYAML==5.3.1
+PyYAML==5.4
 pyzmq==18.1.1
 qtconsole==4.7.1
 QtPy==1.9.0
